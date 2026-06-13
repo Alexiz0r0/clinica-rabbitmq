@@ -1,0 +1,42 @@
+services:
+  # --- TU INSTANCIA ACTUAL (RabbitMQ 4.2) ---
+  rabbitmq:
+    image: rabbitmq:4.2-management-alpine
+    container_name: clinical-rabbitmq
+    ports:
+      - "5672:5672" # Puerto AMQP normal
+      - "15672:15672" # Web UI normal
+      - "5552:5552" # Streams normal
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - clinical-network
+
+  # --- NUEVA INSTANCIA (Ejemplo: RabbitMQ 3.13 en otros puertos) ---
+  rabbitmq-legacy: # 1. Cambió el nombre del servicio
+    image: rabbitmq:3.13-management-alpine
+    container_name: clinical-rabbitmq-old # 2. Cambió el nombre del contenedor
+    ports:
+      # 3. CAMBIARON LOS PUERTOS DEL HOST (Izquierda)
+      # [Puerto_En_Tu_PC]:[Puerto_Dentro_Del_Contenedor]
+      - "5673:5672" # Accederás desde tu app usando el puerto 5673
+      - "15673:15672" # Accederás a la UI web desde http://localhost:15673
+      - "5553:5552" # Accederás a Streams usando el puerto 5553
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data_old:/var/lib/rabbitmq # 4. Cambió el volumen asignado
+    networks:
+      - clinical-network
+
+volumes:
+  rabbitmq_data:
+  rabbitmq_data_old: # Recuerda declarar el nuevo volumen aquí abajo también
+
+networks:
+  clinical-network:
+    driver: bridge

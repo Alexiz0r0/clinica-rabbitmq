@@ -1,0 +1,27 @@
+# https://hub.docker.com/_/rabbitmq/
+# docker pull rabbitmq:4.2-management-alpine
+services:
+  rabbitmq:
+    image: rabbitmq:4.2-management-alpine
+    container_name: clinical-rabbitmq
+    ports:
+      # Puerto estándar para comunicación del protocolo AMQP (Producers y Consumers)
+      - "5672:5672"
+      # Puerto para la Consola Web de Administración (RabbitMQ Web UI)
+      - "15672:15672"
+      # Puerto para Streams (Valor agregado / Criterio 10)
+      - "5552:5552"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - clinical-network
+
+volumes:
+  rabbitmq_data:
+
+networks:
+  clinical-network:
+    driver: bridge
